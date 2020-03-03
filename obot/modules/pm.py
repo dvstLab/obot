@@ -9,7 +9,7 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-from .utils.api_client import avaible_stable_releases, avaible_beta_releases
+from .utils.api_client import available_stable_releases, available_beta_releases
 from .utils.devices import get_devices_list_text_from_codenames, get_last_build
 
 from obot.decorator import register
@@ -31,7 +31,7 @@ async def start(message):
     text = "Hi, I'm a OrangeFox Recovery official bot, here is what I can do:"
     text += "\n - /start: This message"
     text += "\n - /list: List of supported devices"
-    text += "\n - /listbeta: List of avaible beta devices"
+    text += "\n - /listbeta: List of available beta devices"
     text += "\n - /'codename': Get latest build info and download links, for example: /lavender"
     text += "\n\n Developed by Yacha"
 
@@ -43,7 +43,7 @@ async def start(message):
 async def start(message):
     text = f'<b>List of devices which currently have stable releases</b>'
 
-    codenames = await avaible_stable_releases()
+    codenames = await available_stable_releases()
     text += await get_devices_list_text_from_codenames(codenames)
 
     text += "\n\nTo get latest device release write /'codename', for example: /lavender"
@@ -57,7 +57,7 @@ async def start(message):
 async def start(message):
     text = f'<b>List of devices which currently have beta releases</b>'
 
-    codenames = await avaible_beta_releases()
+    codenames = await available_beta_releases()
     text += await get_devices_list_text_from_codenames(codenames)
 
     text += "\n\nTo get latest device release write <code>/'codename' beta</code>, for example: <code>/lavender beta</code>"

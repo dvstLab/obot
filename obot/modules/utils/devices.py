@@ -16,8 +16,8 @@ from operator import itemgetter
 from .api_client import (
     list_devices,
     all_codenames,
-    avaible_stable_releases,
-    avaible_beta_releases,
+    available_stable_releases,
+    available_beta_releases,
     details,
     last_stable_release,
     last_beta_release
@@ -47,10 +47,10 @@ async def get_last_build(codename, build_type):
         return None, None
     
     if build_type == 'stable':
-        if codename not in await avaible_stable_releases():
+        if codename not in await available_stable_releases():
             return None, None
     elif build_type == 'beta':
-        if codename not in await avaible_beta_releases():
+        if codename not in await available_beta_releases():
             return None, None
     
     device_info = await details(codename)

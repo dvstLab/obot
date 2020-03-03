@@ -11,7 +11,7 @@
 
 from aiogram.utils.exceptions import MessageToDeleteNotFound
 
-from .utils.api_client import avaible_stable_releases, avaible_beta_releases
+from .utils.api_client import available_stable_releases, available_beta_releases
 from .utils.devices import get_devices_list_text_from_codenames, get_last_build
 
 from obot.utils.config import CONFIG
@@ -83,9 +83,9 @@ async def list_devices_p(message):
     text = f'<b>List of devices which currently have {chat_type} releases</b>'
 
     if chat_type == 'stable':
-        codenames = await avaible_stable_releases()
+        codenames = await available_stable_releases()
     else:
-        codenames = await avaible_beta_releases()
+        codenames = await available_beta_releases()
 
     text += await get_devices_list_text_from_codenames(codenames)
     text += "\n\nTo get latest device release write /'codename', for example: /lavender. #'codename' and !'codename' are supported too."

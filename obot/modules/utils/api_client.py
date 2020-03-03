@@ -54,22 +54,22 @@ async def list_devices():
     return data
 
 
-async def avaible_releases():
-    api_method = 'avaible_releases/'
+async def available_releases():
+    api_method = 'available_releases/'
     data = await cached_or_make_request(api_method)
 
     return data
 
 
-async def avaible_stable_releases():
-    api_method = 'avaible_stable_releases/'
+async def available_stable_releases():
+    api_method = 'available_stable_releases/'
     data = await cached_or_make_request(api_method)
 
     return data
 
 
-async def avaible_beta_releases():
-    api_method = 'avaible_beta_releases/'
+async def available_beta_releases():
+    api_method = 'available_beta_releases/'
     data = await cached_or_make_request(api_method)
 
     return data
