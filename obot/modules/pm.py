@@ -71,7 +71,7 @@ async def start(message):
 async def get_release(message):
     btype = 'stable'
     arg = message.get_args()
-    codename = message.text.split(' ' + arg)[0][1:].lower()
+    codename = message.text.split()[0][1:].lower()
 
     if arg and arg.split(' ')[0].lower() == 'beta':
         btype = 'beta'
