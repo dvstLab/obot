@@ -50,16 +50,18 @@ def auto_purge(func):
         msg_id = message.message_id
 
         bot_msg_key = 'last_bot_msg_' + str(chat_id)
-        if d := await cache.get(bot_msg_key):
+        if bot_msg := await cache.get(bot_msg_key):
             try:
-                await bot.delete_message(chat_id, d)
+                await bot.delete_message(chat_id, bot_msg)
+                await cache.delete(bot_msg_key)
             except MessageToDeleteNotFound:
                 pass
 
         user_msg_key = 'last_user_msg_' + str(chat_id)
-        if d := await cache.get(user_msg_key):
+        if user_msg := await cache.get(user_msg_key):
             try:
-                await bot.delete_message(chat_id, d)
+                await bot.delete_message(chat_id, user_msg)
+                await cache.delete(user_msg)
             except MessageToDeleteNotFound:
                 pass
 
