@@ -7,7 +7,7 @@ PyYAML>5.0
 # DBs
 redis
 aiocache[redis]
-orjson
+ujson
 
 aiohttp[speedups]
 

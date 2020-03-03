@@ -11,7 +11,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 import aiohttp
-import orjson as json
+import ujson as json
 
 from obot import cache
 
