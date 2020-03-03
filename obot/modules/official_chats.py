@@ -9,6 +9,8 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+from aiogram.utils.exceptions import MessageToDeleteNotFound
+
 from .utils.api_client import avaible_stable_releases, avaible_beta_releases
 from .utils.devices import get_devices_list_text_from_codenames, get_last_build
 
@@ -49,11 +51,17 @@ def auto_purge(func):
 
         bot_msg_key = 'last_bot_msg_' + str(chat_id)
         if d := await cache.get(bot_msg_key):
-            await bot.delete_message(chat_id, d)
+            try:
+                await bot.delete_message(chat_id, d)
+            except MessageToDeleteNotFound:
+                pass
 
         user_msg_key = 'last_user_msg_' + str(chat_id)
         if d := await cache.get(user_msg_key):
-            await bot.delete_message(chat_id, d)
+            try:
+                await bot.delete_message(chat_id, d)
+            except MessageToDeleteNotFound:
+                pass
 
         if 'message_id' in sended_msg:
             await cache.set(bot_msg_key, sended_msg.message_id)
