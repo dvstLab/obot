@@ -88,7 +88,7 @@ async def list_devices_p(message):
         codenames = await avaible_beta_releases()
 
     text += await get_devices_list_text_from_codenames(codenames)
-    text += "\n\nTo get latest device release write /'codename', for example: /lavender"
+    text += "\n\nTo get latest device release write /'codename', for example: /lavender. #'codename' and !'codename' are supported too."
 
     return await message.reply(text)
 
