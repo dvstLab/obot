@@ -63,7 +63,7 @@ async def get_last_build(codename, build_type):
     elif device_info['maintained'] == 2:
         maintained = '⚠️ Not maintained!'
 
-    text = f"<b>Last OrangeFox Recovery {build_type} release</b>"
+    text = f"<b> Latest OrangeFox Recovery {build_type} release</b>"
     text += f"\n📱 {device_info['fullname']} (<code>{device_info['codename']}</code>)"
     text += f"\n🔺 Version: <code>{last_build['version']}</code>"
     text += f"\n👨‍🔬 Maintainer: {device_info['maintainer']}, {maintained}"
