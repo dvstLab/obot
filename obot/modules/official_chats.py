@@ -43,32 +43,33 @@ def get_chat_type(chat_id):
 
 def auto_purge(func):
     async def wrapped(*args, **kwargs):
-        sended_msg = await func(*args, **kwargs)
-
         message = args[0]
         chat_id = message.chat.id
         msg_id = message.message_id
 
         bot_msg_key = 'last_bot_msg_' + str(chat_id)
-        if bot_msg := await cache.get(bot_msg_key):
-            try:
-                await bot.delete_message(chat_id, bot_msg)
-                await cache.delete(bot_msg_key)
-            except MessageToDeleteNotFound:
-                pass
-
         user_msg_key = 'last_user_msg_' + str(chat_id)
-        if user_msg := await cache.get(user_msg_key):
-            try:
-                await bot.delete_message(chat_id, user_msg)
-                await cache.delete(user_msg)
-            except MessageToDeleteNotFound:
-                pass
 
-        if 'message_id' in sended_msg:
+        sended_msg = await func(*args, **kwargs)
+
+        if sended_msg and 'message_id' in sended_msg:
+            if bot_msg := await cache.get(bot_msg_key):
+                try:
+                    await bot.delete_message(chat_id, bot_msg)
+                except MessageToDeleteNotFound:
+                    pass
+
+            if user_msg := await cache.get(user_msg_key):
+                try:
+                    await bot.delete_message(chat_id, user_msg)
+                except MessageToDeleteNotFound:
+                    pass
+
             await cache.set(bot_msg_key, sended_msg.message_id)
-        if 'message_id' in message:
-            await cache.set(user_msg_key, message.message_id)
+    
+            if 'message_id' in message:
+                pass
+                await cache.set(user_msg_key, message.message_id)
 
     return wrapped
 
