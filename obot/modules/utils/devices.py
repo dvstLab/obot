@@ -60,7 +60,7 @@ async def get_last_build(codename, build_type):
         maintained = 'Maintained'
     elif device_info['maintained'] == 2:
         maintained = 'Maintained without having device on hands'
-    elif device_info['maintained'] == 2:
+    elif device_info['maintained'] == 3:
         maintained = '⚠️ Not maintained!'
 
     text = f"<b> Latest OrangeFox Recovery {build_type} release</b>"
