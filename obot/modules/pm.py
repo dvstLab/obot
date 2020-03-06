@@ -66,12 +66,12 @@ async def start(message):
     await message.reply(text)
 
 
-@register(regexp='^[/!#]')
+@register(cmd='\w+', add_cmd_start_symbols='!#')
 @is_pm
 async def get_release(message):
     btype = 'stable'
     arg = message.get_args()
-    codename = message.text.split()[0][1:].lower()
+    codename = message.text.split()[0][1:].split('@')[0].lower()
 
     if arg and arg.split(' ')[0].lower() == 'beta':
         btype = 'beta'

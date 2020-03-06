@@ -93,14 +93,14 @@ async def list_devices_p(message):
     return await message.reply(text)
 
 
-@register(regexp='^[/!#]')
+@register(cmd='\w+', add_cmd_start_symbols='!#')
 @is_orangefox_chat
 @auto_purge
 async def get_release(message):
     btype = get_chat_type(message.chat.id)
 
     arg = message.get_args()
-    codename = message.text.split()[0][1:].lower()
+    codename = message.text.split()[0][1:].split('@')[0].lower()
 
     if arg and arg.split(' ')[0].lower() == 'beta':
         btype = 'beta'

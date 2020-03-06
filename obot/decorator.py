@@ -18,10 +18,10 @@ from obot import BOT_USERNAME, dp
 from obot.utils.logger import log
 
 
-def register(*args, cmd=None, f=None, allow_edited=True, allow_kwargs=False, **kwargs):
+def register(*args, cmd=None, f=None, allow_edited=True, allow_kwargs=False, add_cmd_start_symbols='!', **kwargs):
     register_kwargs = {}
     if cmd:
-        regex = r'\A^[!/]('
+        regex = f'\A^[/{add_cmd_start_symbols}]('
         regex += cmd
 
         if 'disable_args' in kwargs:
