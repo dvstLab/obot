@@ -56,19 +56,24 @@ async def get_last_build(codename, build_type):
     device_info = await details(codename)
     last_build = await last_stable_release(codename) if build_type == 'stable' else await last_beta_release(codename)
 
+    maintained = ''
     if device_info['maintained'] == 1:
-        maintained = 'Maintained'
+        maintained = f"\nMaintainer: {device_info['maintainer']}, Maintained"
     elif device_info['maintained'] == 2:
-        maintained = 'Maintained without having device on hands'
+        maintained = f"\nMaintainer: {device_info['maintainer']}, Maintained without having device on hands"
     elif device_info['maintained'] == 3:
-        maintained = '⚠️ Not maintained!'
+        maintained = f"\n⚠️ Not maintained! Previous maintainer: {device_info['maintainer']}"
 
     text = f"<b> Latest OrangeFox Recovery {build_type} release</b>"
-    text += f"\n📱 {device_info['fullname']} (<code>{device_info['codename']}</code>)"
+    text += maintained
     text += f"\n🔺 Version: <code>{last_build['version']}</code>"
     text += f"\n👨‍🔬 Maintainer: {device_info['maintainer']}, {maintained}"
     text += f"\n📄 <code>{last_build['file_name']}</code>: {last_build['size_human']}"
     text += f"\n✅ File MD5: <code>{last_build['md5']}</code>"
+
+    if 'notes' in last_build:
+        text += "\n\n📝 <b>Build notes:</b>\n"
+        text += last_build['notes']
 
     buttons = InlineKeyboardMarkup().add(InlineKeyboardButton(
         '⬇️ Download',
