@@ -69,6 +69,7 @@ async def get_last_build(codename, build_type):
     text += f"\n🔺 Version: <code>{last_build['version']}</code>"
     text += f"\n👨‍🔬 Maintainer: {device_info['maintainer']}, {maintained}"
     text += f"\n📄 <code>{last_build['file_name']}</code>: {last_build['size_human']}"
+    text += f"\n📅 Release date: " + last_build['date']
     text += f"\n✅ File MD5: <code>{last_build['md5']}</code>"
 
     if 'notes' in last_build:
