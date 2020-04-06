@@ -41,6 +41,7 @@ def get_chat_type(chat_id):
     
     return chat_type
 
+
 def auto_purge(func):
     async def wrapped(*args, **kwargs):
         message = args[0]
@@ -72,6 +73,7 @@ def auto_purge(func):
                 await cache.set(user_msg_key, message.message_id)
 
     return wrapped
+
 
 @register(cmd='list')
 @is_orangefox_chat
