@@ -33,10 +33,14 @@ async def start(message):
     text += "\n - /start: This message"
     text += "\n - /list: List of supported devices"
     text += "\n - /listbeta: List of available beta devices"
-    text += "\n - /'codename': Get latest build info and download links, for example: /lavender"
-    text += "\n\n Developed by Yacha"
+    text += "\n - <code>/codename</code>: Get latest build info and download links, for example: /lavender"
+    text += "\n\n - Supports non-OrangeFox chats, add me in your chats and write /start to get help"
+    text += "\n - Supports inline mode, try write <code>@ofoxr_bot</code> in any chat where inline is not disabled"
+    text += '\n\n Made by Yacha'
+    text += ' | powered by <a href="api.orangefox.tech">OrangeFox API</a>'
+    text += ' | <a href="https://gitlab.com/OrangeFox/site/obot">Sources</a>'
 
-    await message.reply(text)
+    await message.reply(text, disable_web_page_preview=True)
 
 
 @register(cmd='list')
