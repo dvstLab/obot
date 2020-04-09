@@ -74,7 +74,6 @@ def auto_purge(func):
             await cache.set(bot_msg_key, sended_msg.message_id)
 
             if 'message_id' in message:
-                pass
                 await cache.set(user_msg_key, message.message_id)
 
     return wrapped
