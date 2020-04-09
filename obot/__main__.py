@@ -18,6 +18,7 @@ from obot.utils.logger import log
 
 import_module("obot.modules.official_chats")
 import_module("obot.modules.pm")
+import_module("obot.modules.inline")
 
 log.info("Starting bot..")
 
