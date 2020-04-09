@@ -26,7 +26,12 @@ def is_orangefox_chat(func):
             return
 
         chat_id = message.chat.id
-        if chat_id not in CONFIG['CHATS']:
+
+        chats = CONFIG['CHATS']
+        chats.append(CONFIG['STABLE_CHAT'])
+        chats.append(CONFIG['BETA_CHAT'])
+
+        if chat_id not in chats:
             return
 
         return await func(*args, **kwargs)
