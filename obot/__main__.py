@@ -9,18 +9,15 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-import asyncio
-
-from aiogram import executor
 from importlib import import_module
 
-from obot.utils.logger import log
-from obot import dp
+from aiogram import executor
 
+from obot import dp
+from obot.utils.logger import log
 
 import_module("obot.modules.official_chats")
 import_module("obot.modules.pm")
-
 
 log.info("Starting bot..")
 

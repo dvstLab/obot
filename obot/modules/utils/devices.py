@@ -9,9 +9,9 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
-
 from operator import itemgetter
+
+from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
 
 from .api_client import (
     list_devices,
@@ -45,14 +45,14 @@ async def get_devices_list_text_from_codenames(codenames):
 async def get_last_build(codename, build_type):
     if codename not in await all_codenames():
         return None, None
-    
+
     if build_type == 'stable':
         if codename not in await available_stable_releases():
             return None, None
     elif build_type == 'beta':
         if codename not in await available_beta_releases():
             return None, None
-    
+
     device_info = await details(codename)
     last_build = await last_stable_release(codename) if build_type == 'stable' else await last_beta_release(codename)
 

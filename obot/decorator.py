@@ -10,12 +10,13 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-from aiogram import types
 from aiogram.dispatcher.handler import SkipHandler
-#from sentry_sdk import configure_scope
 
 from obot import BOT_USERNAME, dp
 from obot.utils.logger import log
+
+
+# from sentry_sdk import configure_scope
 
 
 def register(*args, cmd=None, f=None, allow_edited=True, allow_kwargs=False, add_cmd_start_symbols='!', **kwargs):
@@ -44,7 +45,7 @@ def register(*args, cmd=None, f=None, allow_edited=True, allow_kwargs=False, add
                 def_kwargs = dict()
 
             # Sentry
-            #with configure_scope() as scope:
+            # with configure_scope() as scope:
             #    scope.set_extra("update", str(message))
 
             await func(*def_args, **def_kwargs)

@@ -9,10 +9,10 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+from obot.decorator import register
 from .utils.api_client import available_stable_releases, available_beta_releases
 from .utils.devices import get_devices_list_text_from_codenames, get_last_build
 
-from obot.decorator import register
 
 def is_pm(func):
     async def wrapped(*args, **kwargs):
@@ -22,6 +22,7 @@ def is_pm(func):
             return await func(*args, **kwargs)
 
         return
+
     return wrapped
 
 
@@ -75,12 +76,10 @@ async def get_release(message):
 
     if arg and arg.split(' ')[0].lower() == 'beta':
         btype = 'beta'
-    
+
     text, buttons = await get_last_build(codename, btype)
-    
+
     if not text:
         return
 
     await message.reply(text, reply_markup=buttons)
-
-

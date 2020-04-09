@@ -11,12 +11,11 @@
 
 from aiogram.utils.exceptions import MessageToDeleteNotFound
 
+from obot import cache, bot
+from obot.decorator import register
+from obot.utils.config import CONFIG
 from .utils.api_client import available_stable_releases, available_beta_releases
 from .utils.devices import get_devices_list_text_from_codenames, get_last_build
-
-from obot.utils.config import CONFIG
-from obot.decorator import register
-from obot import cache, bot
 
 
 def is_orangefox_chat(func):
@@ -31,6 +30,7 @@ def is_orangefox_chat(func):
             return
 
         return await func(*args, **kwargs)
+
     return wrapped
 
 
@@ -38,7 +38,7 @@ def get_chat_type(chat_id):
     chat_type = 'stable'
     if chat_id == CONFIG['BETA_CHAT']:
         chat_type = 'beta'
-    
+
     return chat_type
 
 
@@ -67,7 +67,7 @@ def auto_purge(func):
                     pass
 
             await cache.set(bot_msg_key, sended_msg.message_id)
-    
+
             if 'message_id' in message:
                 pass
                 await cache.set(user_msg_key, message.message_id)
@@ -108,7 +108,7 @@ async def get_release(message):
         btype = 'beta'
 
     text, buttons = await get_last_build(codename, btype)
-    
+
     if not text:
         return
 

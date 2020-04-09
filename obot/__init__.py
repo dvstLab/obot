@@ -11,12 +11,11 @@
 
 import asyncio
 
-from aiogram import Bot, Dispatcher, types
 from aiocache import caches
+from aiogram import Bot, Dispatcher, types
 
-from obot.utils.logger import log
 from obot.utils.config import CONFIG
-
+from obot.utils.logger import log
 
 log.info("------------------------------")
 log.info("|   OrangeFox Recovery bot   |")
@@ -58,7 +57,6 @@ else:
     })
 
 cache = caches.get('default')
-
 
 log.debug("Getting bot info...")
 loop = asyncio.get_event_loop()

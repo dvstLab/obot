@@ -15,7 +15,6 @@ import ujson as json
 
 from obot import cache
 
-
 API_HOST = 'https://api.orangefox.tech/'
 CACHE_EXPIRE = 300
 
@@ -37,7 +36,6 @@ async def cached_or_make_request(api_method):
     await cache.expire(api_method, CACHE_EXPIRE)
 
     return json.loads(data)
-
 
 
 async def all_codenames():
