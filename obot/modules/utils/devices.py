@@ -58,16 +58,15 @@ async def get_last_build(codename, build_type):
 
     maintained = ''
     if device_info['maintained'] == 1:
-        maintained = f"\nMaintainer: {device_info['maintainer']}, Maintained"
+        maintained = f"Maintainer: {device_info['maintainer']}, Maintained"
     elif device_info['maintained'] == 2:
-        maintained = f"\nMaintainer: {device_info['maintainer']}, Maintained without having device on hands"
+        maintained = f"Maintainer: {device_info['maintainer']}, Maintained without having device on hands"
     elif device_info['maintained'] == 3:
-        maintained = f"\n⚠️ Not maintained! Previous maintainer: {device_info['maintainer']}"
+        maintained = f"⚠️ Not maintained! Previous maintainer: {device_info['maintainer']}"
 
     text = f"<b> Latest OrangeFox Recovery {build_type} release</b>"
-    text += maintained
     text += f"\n🔺 Version: <code>{last_build['version']}</code>"
-    text += f"\n👨‍🔬 Maintainer: {device_info['maintainer']}, {maintained}"
+    text += f"\n👨‍🔬 {maintained}"
     text += f"\n📄 <code>{last_build['file_name']}</code>: {last_build['size_human']}"
     text += f"\n📅 Release date: " + last_build['date']
     text += f"\n✅ File MD5: <code>{last_build['md5']}</code>"
