@@ -14,8 +14,10 @@ from aiogram.utils.exceptions import MessageToDeleteNotFound
 from obot import cache, bot
 from obot.decorator import register
 from obot.utils.config import CONFIG
-from .utils.api_client import available_stable_releases, available_beta_releases
-from .utils.devices import get_devices_list_text_from_codenames, get_last_build
+
+from .utils.api_client import get_devices_with_releases, all_devices
+from .utils.devices import get_devices_list_text, release_info
+from .utils.message import get_cmd, get_args
 
 
 def is_orangefox_chat(func):
@@ -51,14 +53,13 @@ def auto_purge(func):
     async def wrapped(*args, **kwargs):
         message = args[0]
         chat_id = message.chat.id
-        msg_id = message.message_id
 
         bot_msg_key = 'last_bot_msg_' + str(chat_id)
         user_msg_key = 'last_user_msg_' + str(chat_id)
 
-        sended_msg = await func(*args, **kwargs)
+        sent_msg = await func(*args, **kwargs)
 
-        if sended_msg and 'message_id' in sended_msg:
+        if sent_msg and 'message_id' in sent_msg:
             if bot_msg := await cache.get(bot_msg_key):
                 try:
                     await bot.delete_message(chat_id, bot_msg)
@@ -71,7 +72,7 @@ def auto_purge(func):
                 except MessageToDeleteNotFound:
                     pass
 
-            await cache.set(bot_msg_key, sended_msg.message_id)
+            await cache.set(bot_msg_key, sent_msg.message_id)
 
             if 'message_id' in message:
                 await cache.set(user_msg_key, message.message_id)
@@ -84,17 +85,19 @@ def auto_purge(func):
 @auto_purge
 async def list_devices_p(message):
     chat_id = message.chat.id
-    chat_type = get_chat_type(chat_id)
+    build_type = get_chat_type(chat_id)
 
-    text = f'<b>List of devices which currently have {chat_type} releases</b>'
+    arg = get_args(message)
+    if arg and arg[0] == 'beta':
+        build_type = 'beta'
 
-    if chat_type == 'stable':
-        codenames = await available_stable_releases()
-    else:
-        codenames = await available_beta_releases()
+    text = f'<b>List of devices which currently have {build_type} releases</b>'
 
-    text += await get_devices_list_text_from_codenames(codenames)
-    text += "\n\nTo get latest device release write /'codename', for example: /lavender. #'codename' and !'codename' are supported too."
+    devices = await get_devices_with_releases(build_type=build_type)
+    text += await get_devices_list_text(devices)
+
+    text += '\n\nTo get latest device release write <code>/(codename)</code>, for example: /lavender.'\
+            '\n<code>#(codename)</code> and <code>(codename)</code> are supported too.'
 
     return await message.reply(text)
 
@@ -103,15 +106,18 @@ async def list_devices_p(message):
 @is_orangefox_chat
 @auto_purge
 async def get_release(message):
-    btype = get_chat_type(message.chat.id)
+    build_type = get_chat_type(message.chat.id)
 
-    arg = message.get_args()
-    codename = message.text.split()[0][1:].split('@')[0].lower()
+    arg = get_args(message)
+    codename = get_cmd(message)
 
-    if arg and arg.split(' ')[0].lower() == 'beta':
-        btype = 'beta'
+    if codename not in await all_devices(only_codenames=True):
+        return
 
-    text, buttons = await get_last_build(codename, btype)
+    if arg and arg[0] == 'beta':
+        build_type = 'beta'
+
+    text, buttons = await release_info(codename, build_type, 'last')
 
     if not text:
         return

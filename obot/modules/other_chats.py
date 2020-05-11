@@ -10,8 +10,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 
-from .utils.api_client import available_stable_releases, all_codenames
-from .utils.devices import get_devices_list_text_from_codenames, get_last_build
+from .utils.api_client import get_devices_with_releases, all_devices
+from .utils.devices import get_devices_list_text, release_info
 
 from obot.decorator import register
 from obot.utils.config import CONFIG
@@ -19,7 +19,6 @@ from obot.utils.config import CONFIG
 
 def is_other_chat(func):
     async def wrapped(*args, **kwargs):
-        print('test')
         message = args[0]
 
         if message.chat.type == 'private':
@@ -39,16 +38,19 @@ def is_other_chat(func):
     return wrapped
 
 
-@register(cmd='start')
+@register(cmd='start|help')
 @is_other_chat
 async def start(message):
-    text = "Hi, I'm a OrangeFox Recovery official bot, here is what I can do:"
-    text += "\n - /start: This message"
-    text += "\n - /orangefox: List of devices with official Stable releases available"
-    text += "\n - /orangefox (codename): Gets latest Stable build"
-    text += "\nInstead of <code>/orangefox</code> command you can use any of this aliases:"
-    text += "\n/fox, /of, /ofox, /ofoxr"
-    text += '\n\nPM to me and write /start if you want see more info about me.'
+    text = 'Hi, I\'m the official OrangeFox Recovery bot, here is what I can do for non-OrangeFox chats:' \
+           '\n - /start: This will start me up and show you this message.' \
+           '\n - /orangefox: This will show you a list of devices with official stable releases available.' \
+           '\n - <code>/orangefox (codename)</code>: This will get you the latest stable build, for example: ' \
+           '"/orangefox lavender"' \
+           '\nInstead of the <code>/orangefox</code> command, you can use any of this aliases:' \
+           '\n/fox, /of, /ofox, /ofoxr' \
+           '\nI only support stable releases, if you want to get beta releases - PM me.' \
+           '\n' \
+           '\nPM me and type /start if you want see more information about me.'
 
     await message.reply(text)
 
@@ -56,18 +58,20 @@ async def start(message):
 @register(cmd='orangefox|fox|of|ofox|ofoxr')
 @is_other_chat
 async def orangefox_cmd(message):
+    build_type = 'stable'
     arg = message.get_args()
     if not arg:
-        text = f'<b>List of devices which currently have Stable releases</b>'
-        text += await get_devices_list_text_from_codenames(await available_stable_releases())
+        text = f'<b>List of devices which currently have stable releases</b>'
+        devices = await get_devices_with_releases(build_type=build_type)
+        text += await get_devices_list_text(devices)
         text += "\n\nTo get latest device release write /orangefox (codename), for example: /orangefox lavender."
 
         return await message.reply(text)
 
     codename = arg.split(' ')[0].lower()
-    if codename not in await all_codenames():
+    if codename not in await all_devices(only_codenames=True):
         return await message.reply('This device is not supported! To see a list of devices write /orangefox.')
 
-    text, buttons = await get_last_build(codename, 'stable')
+    text, buttons = await release_info(codename, build_type, 'last')
 
     return await message.reply(text, reply_markup=buttons)

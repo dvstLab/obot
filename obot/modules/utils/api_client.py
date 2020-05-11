@@ -15,13 +15,16 @@ import ujson as json
 
 from obot import cache
 
-API_HOST = 'https://api.orangefox.tech/'
+API_HOST = 'https://api.orangefox.download/v2/'
 CACHE_EXPIRE = 300
 
 
 async def send_request(api_method):
     async with aiohttp.ClientSession() as session:
         async with session.get(API_HOST + api_method) as response:
+            if response.status == 404:
+                return 404
+
             text = await response.text()
             return text
 
@@ -35,67 +38,63 @@ async def cached_or_make_request(api_method):
     await cache.set(api_method, data)
     await cache.expire(api_method, CACHE_EXPIRE)
 
+    if data == 404:
+        return None
+
     return json.loads(data)
 
 
-async def all_codenames():
-    api_method = 'all_codenames/'
+async def all_devices(only_codenames=False):
+    api_method = 'device'
+
+    if only_codenames:
+        api_method += f'?only_codenames=True'
+
     data = await cached_or_make_request(api_method)
 
     return data
 
 
-async def list_devices():
-    api_method = 'list_devices/'
+async def get_device(codename):
+    api_method = f'device/{codename}'
     data = await cached_or_make_request(api_method)
 
     return data
 
 
-async def available_releases():
-    api_method = 'available_releases/'
+async def get_all_oems():
+    api_method = 'oem'
     data = await cached_or_make_request(api_method)
 
     return data
 
 
-async def available_stable_releases():
-    api_method = 'available_stable_releases/'
+async def get_oem_devices(oem_name):
+    api_method = f'oem/{oem_name}'
     data = await cached_or_make_request(api_method)
 
     return data
 
 
-async def available_beta_releases():
-    api_method = 'available_beta_releases/'
-    data = await cached_or_make_request(api_method)
+async def get_devices_with_releases(build_type=None, only_codenames=False):
+    if build_type == 'any':
+        build_type = None
 
-    return data
+    if not build_type:
+        api_method = f'device/releases'
+    else:
+        api_method = f'device/releases/{build_type}'
 
-
-async def details(codename):
-    api_method = f'details/{codename}/'
-    data = await cached_or_make_request(api_method)
-
-    return data
-
-
-async def last_release(codename):
-    api_method = f'last_release/{codename}/'
-    data = await cached_or_make_request(api_method)
-
-    return data
+    if only_codenames:
+        api_method += f'?only_codenames=True'
+    return await cached_or_make_request(api_method)
 
 
-async def last_stable_release(codename):
-    api_method = f'last_stable_release/{codename}/'
-    data = await cached_or_make_request(api_method)
+async def get_release(codename, version, build_type=None):
+    if not build_type:
+        api_method = f'device/{codename}/releases/{version}'
+    else:
+        api_method = f'device/{codename}/releases/{build_type}/{version}'
+    return await cached_or_make_request(api_method)
 
-    return data
 
-
-async def last_beta_release(codename):
-    api_method = f'last_beta_release/{codename}/'
-    data = await cached_or_make_request(api_method)
-
-    return data

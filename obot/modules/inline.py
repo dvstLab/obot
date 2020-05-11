@@ -13,8 +13,8 @@ import hashlib
 
 from aiogram.types import InlineQuery, InputTextMessageContent, InlineQueryResultArticle
 
-from .utils.api_client import available_stable_releases, available_beta_releases, details, all_codenames
-from .utils.devices import get_devices_list_text_from_codenames, get_last_build
+from .utils.api_client import get_devices_with_releases, all_devices, get_device
+from .utils.devices import get_devices_list_text, release_info
 
 from obot import dp
 
@@ -27,8 +27,9 @@ async def inline_echo(inline_query: InlineQuery):
         articles = []
 
         stable_devices_text = "<b>Devices with Stable releases available:</b>"
-        stable_devices_text += await get_devices_list_text_from_codenames(await available_stable_releases())
-        stable_devices_text += "\n\nWrite <code>@ofoxr_bot codename</code> to get the last release"
+        devices = await get_devices_with_releases(build_type='stable')
+        stable_devices_text += await get_devices_list_text(devices)
+        stable_devices_text += "\n\nWrite <code>@ofoxr_bot (codename)</code> to get the last release"
 
         articles.append(
             InlineQueryResultArticle(
@@ -40,8 +41,9 @@ async def inline_echo(inline_query: InlineQuery):
         )
 
         beta_devices_text = "<b>Devices with Beta releases available:</b>"
-        beta_devices_text += await get_devices_list_text_from_codenames(await available_beta_releases())
-        beta_devices_text += "\n\nWrite <code>@ofoxr_bot codename</code> to get the last release"
+        devices = await get_devices_with_releases(build_type='beta')
+        beta_devices_text += await get_devices_list_text(devices)
+        beta_devices_text += "\n\nWrite <code>@ofoxr_bot (codename)</code> to get the last release"
 
         articles.append(
             InlineQueryResultArticle(
@@ -54,13 +56,13 @@ async def inline_echo(inline_query: InlineQuery):
         return await inline_query.answer(results=articles, cache_time=100)
 
     codename = request.split(' ')[0].lower()
-    if codename not in await all_codenames():
+    if codename not in await all_devices(only_codenames=True):
         return await inline_query.answer([])
 
-    device = await details(codename)
+    device = await get_device(codename)
     articles = []
 
-    text, buttons = await get_last_build(codename, 'stable')
+    text, buttons = await release_info(codename, 'stable', 'last')
     articles.append(
         InlineQueryResultArticle(
             id=hashlib.md5((request + 'stable').encode()).hexdigest(),
@@ -70,7 +72,7 @@ async def inline_echo(inline_query: InlineQuery):
         )
     )
 
-    text, buttons = await get_last_build(codename, 'beta')
+    text, buttons = await release_info(codename, 'beta', 'last')
     if text:
         articles.append(
             InlineQueryResultArticle(

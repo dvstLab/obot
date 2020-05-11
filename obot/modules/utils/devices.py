@@ -13,78 +13,64 @@ from operator import itemgetter
 
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
 
-from .api_client import (
-    list_devices,
-    all_codenames,
-    available_stable_releases,
-    available_beta_releases,
-    details,
-    last_stable_release,
-    last_beta_release
-)
+from .api_client import get_device, get_release
 
 
-async def get_devices_list_text_from_codenames(codenames):
-    devices_info = await list_devices()
-    devices = []
-    for codename in codenames:
-        data = [element for element in devices_info if element['codename'] == codename]
-        if not data:
-            continue
-        data = data[0]
-        fullname = data['fullname']
-        devices.append((fullname, codename))
-
+async def get_devices_list_text(devices, devices_filter=None):
     text = ''
-    for device in sorted(devices, key=itemgetter(0)):
-        text += f'\n- {device[0]} (<code>{device[1]}</code>)'
+    for device in devices:
+        if devices_filter:
+            print(device)
+            if device['codename'] not in devices_filter:
+                continue
+
+        text += f"\n- {device['fullname']} (/{device['codename']})"
 
     return text
 
 
-async def get_last_build(codename, build_type):
-    if codename not in await all_codenames():
+async def release_info(codename, build_type, version):
+    if build_type == 'last':
+        build_type = None
+
+    device = await get_device(codename)
+    if not device:
         return None, None
 
-    if build_type == 'stable':
-        if codename not in await available_stable_releases():
-            return None, None
-    elif build_type == 'beta':
-        if codename not in await available_beta_releases():
-            return None, None
-
-    device_info = await details(codename)
-    last_build = await last_stable_release(codename) if build_type == 'stable' else await last_beta_release(codename)
+    release = await get_release(codename, version, build_type=build_type)
+    if not release:
+        return None, None
 
     maintained = ''
-    if device_info['maintained'] == 1:
-        maintained = f"Maintainer: {device_info['maintainer']}, Maintained"
-    elif device_info['maintained'] == 2:
-        maintained = f"Maintainer: {device_info['maintainer']}, Maintained without having device on hands"
-    elif device_info['maintained'] == 3:
-        maintained = f"⚠️ Not maintained! Previous maintainer: {device_info['maintainer']}"
+    if device['maintained'] == 1:
+        maintained = f"Maintainer: {device['maintainer']['name']}, Maintained"
+    elif device['maintained'] == 2:
+        maintained = f"Maintainer: {device['maintainer']['name']}, Maintained without having device on hands"
+    elif device['maintained'] == 3:
+        maintained = f"⚠️ Not maintained! Previous maintainer: {device['maintainer']['name']}"
 
-    text = f"<b> Latest OrangeFox Recovery {build_type} release</b>"
-    text += f"\n🔺 Version: <code>{last_build['version']}</code>"
+    text = f"<b>Latest OrangeFox Recovery {release['build_type']} release</b>"
+    text += f"\n📱 Device: {device['fullname']} (<code>{device['codename']}</code>)"
+    text += f"\n🔺 Version: <code>{release['version']}</code>"
     text += f"\n👨‍🔬 {maintained}"
-    text += f"\n📄 <code>{last_build['file_name']}</code>: {last_build['size_human']}"
-    text += f"\n📅 Release date: " + last_build['date']
-    text += f"\n✅ File MD5: <code>{last_build['md5']}</code>"
+    text += f"\n📄 <code>{release['file_name']}</code>: {release['size_human']}"
+    text += f"\n📅 Release date: " + release['date']
+    text += f"\n✅ File MD5: <code>{release['md5']}</code>"
 
-    if 'notes' in last_build:
+    if 'notes' in release:
         text += "\n\n📝 <b>Build notes:</b>\n"
-        text += last_build['notes']
+        text += release['notes']
 
     buttons = InlineKeyboardMarkup().add(InlineKeyboardButton(
         '⬇️ Download',
-        url=last_build['url']
+        url=release['url']
     ))
 
-    if 'sf' in last_build:
+    if 'sf' in release:
         buttons.insert(
             InlineKeyboardButton(
                 '☁️ Mirror',
-                url=last_build['sf']['url']
+                url=release['sf']['url']
             )
         )
 
