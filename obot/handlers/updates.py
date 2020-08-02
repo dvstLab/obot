@@ -73,11 +73,11 @@ async def subscribe_cmd(message: Message, strings={}):
     query = Query()
 
     if codename != 'any':
-        if db_subscribes.search(query.chat_id == chat_id and query.codename == 'any'):
+        if db_subscribes.search((query.chat_id == chat_id) & (query.codename == 'any')):
             await message.reply(strings['sub_err'].format(codename=codename))
             return
 
-    if db_subscribes.search(query.chat_id == chat_id and query.codename == codename):
+    if db_subscribes.search((query.chat_id == chat_id) & (query.codename == codename)):
         await message.reply(strings['sub_err'].format(codename=codename))
         return
 
@@ -100,7 +100,7 @@ async def unsubscribe_cmd(message: Message, strings={}):
 
     query = Query()
 
-    check = db_subscribes.remove(query.chat_id == chat_id and query.codename == codename)
+    check = db_subscribes.remove((query.chat_id == chat_id) & (query.codename == codename))
     if check:
         await message.reply(strings['unsub_done'].format(codename=codename))
     else:
