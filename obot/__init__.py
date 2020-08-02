@@ -1,4 +1,4 @@
-# Copyright (C) 2019 The Raphielscape Company LLC.
+# Copyright (C) 2017-2020 OrangeFox Recovery
 # Copyright (C) 2018 - 2020 MrYacha
 # Copyright (C) 2018 - 2020 Sophie
 # Copyright (C) 2020 oBOT
@@ -9,17 +9,24 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+import os
 import asyncio
+import yaml
+
+from tinydb import TinyDB
 
 from aiocache import caches
 from aiogram import Bot, Dispatcher, types
 
-from obot.utils.config import CONFIG
-from obot.utils.logger import log
 
-log.info("------------------------------")
-log.info("|   OrangeFox Recovery bot   |")
-log.info("------------------------------")
+VERSION = 'v4'
+
+
+print("------------------------------")
+print("|   OrangeFox Recovery bot   |")
+print("------------------------------")
+
+CONFIG = yaml.load(open('data/config.yaml', "r"), Loader=yaml.Loader)
 
 TOKEN = CONFIG['TOKEN']
 OWNER_ID = CONFIG['OWNER_ID']
@@ -27,9 +34,14 @@ OWNER_ID = CONFIG['OWNER_ID']
 bot = Bot(token=TOKEN, parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot)
 
-log.debug("Enabling cache...")
+print("Enabling databases...")
+path: str = CONFIG['DB_PATH']
+
+db = TinyDB(CONFIG['DB_PATH'])
+
+print("Enabling cache...")
 if 'REDIS' in CONFIG:
-    log.debug("* Enabling redis cache")
+    print("* Enabling redis cache")
     caches.set_config({
         'default': {
             'cache': "aiocache.RedisCache",
@@ -46,7 +58,7 @@ if 'REDIS' in CONFIG:
         }
     })
 else:
-    log.debug("* Enabling simple memory cache")
+    print("* Enabling simple memory cache")
     caches.set_config({
         'default': {
             'cache': "aiocache.SimpleMemoryCache",
@@ -58,7 +70,7 @@ else:
 
 cache = caches.get('default')
 
-log.debug("Getting bot info...")
+print("Getting bot info...")
 loop = asyncio.get_event_loop()
 bot_info = loop.run_until_complete(bot.get_me())
 BOT_USERNAME = bot_info.username

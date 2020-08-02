@@ -8,7 +8,12 @@ PyYAML>5.0
 redis
 aiocache[redis]
 ujson
+tinydb
 
 aiohttp[speedups]
+babel
 
+aiocron
+
+--extra-index-url https://gitlab.com/api/v4/projects/20272543/packages/pypi/simple
 

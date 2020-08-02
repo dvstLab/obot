@@ -9,13 +9,14 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-from aiogram import executor
 
-from obot import dp
-from obot.handlers import __setup__ as handlers
+def get_cmd(message) -> str:
+    cmd = message.text.lower().split()[0][1:].split('@')[0]
+    return cmd
 
-handlers(dp)
 
-print("Starting bot..")
-
-executor.start_polling(dp, skip_updates=True)
+def get_args(message) -> list:
+    args = message.get_args()
+    if not args:
+        return []
+    return args.lower().split(' ')

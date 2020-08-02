@@ -1,0 +1,84 @@
+# Releases types
+stable: 'Stable'
+beta: 'Beta'
+any: 'Any'
+
+# PM handlers
+pm_start_text: |
+   Hi, I'm the official OrangeFox Recovery bot (<code>{version}</code>), here is what I can do for you:
+   - /start: This message.
+   - /list: This shows you a list of supported devices.
+   - <code>/list beta</code>: This shows you a list of available devices that are in beta.
+   - <code>/(codename)</code>: Get the latest stable build info and download links, for example: /lavender
+   - <code>/(codename) beta</code>: Same as above, but I'll show you a beta build.
+   - <code>/(codename) last</code>: Same as the two above, but I'll show you the latest build from the beta or stable list.
+   - <code>/(OEM)</code>: This will show you all devices from that OEM, that have stable releases, for example: /Xiaomi.
+   - <code>/(OEM) beta</code>: This will show you all devices with available beta releases from that OEM.
+
+   - Supports non-OrangeFox chats, add me to your chats and type /start to get help.
+   - I support inline mode, try to type <code>@ofoxr_bot</code> in any chat where inline is <b>NOT</b> disabled.
+   - Subscriptions supports, read /subscriptionhelp for more info.
+
+   Made by @MrYacha | powered by <a href="api.orangefox.tech">OrangeFox API</a> | <a href="https://gitlab.com/OrangeFox/infrastructure/obot">Sources</a>
+   Runs on <a href="https://www.ua-hosting.company">ua-hosting.company</a>'s servers
+pm_btn_upd: '🆕 Updates tracker'
+pm_btn_support_chat: '💬 Support chat'
+pm_btn_news: '📝 NEWS'
+pm_btn_dl: '⬇️ Downloads website'
+
+list_title: "<b>Devices that have {build_type} releases:</b>"
+
+list_help: "\n\nTo get the latest stable release type <code>/(codename)</code>, for example: /lavender"
+list_help_beta: "\nIf you want to see the beta devices list, type <code>/list beta</code>"
+
+list_oem_title: "<b>List of devices by {oem_name} which currently have {build_type} releases</b>"
+list_oem_help: "\nIf you want see the list of all devices type /list"
+
+# Other chats
+other_chats_start: |
+   Hi, I'm the official OrangeFox Recovery bot, here is what I can do for non-OrangeFox chats:
+    - /start: This will start me up and show you this message.
+    - /orangefox: This will show you a list of devices with official stable releases available.
+    - <code>/orangefox (codename)</code>: This will get you the latest stable build, for example: <code>/orangefox lavender</code>
+    - Subscriptions supports, read /subscriptionhelp for more info
+
+   Instead of the <code>/orangefox</code> command, you can use any of these aliases:
+      /fox, /of, /ofox, /ofoxr'
+   I only  stable releases, if you want to get beta releases - PM me.
+
+   PM me and type /start if you want see more information about me.
+other_chats_get: "\n\nTo get latest device release type /orangefox (codename), for example: /orangefox lavender."
+other_chats_404: "This device is not supported! To see a list of devices type /orangefox."
+
+# Inline
+inline_list_title: "Devices which have {build_type} releases:"
+inline_list_desk: "This will send a list of devices which have {build_type} releases"
+inline_get: "\n\nType <code>@ofoxr_bot (codename)</code> to get the last release"
+inline_release_title: 'Latest Stable release for {fullname} ({codename})'
+
+# Updates
+subscriptionhelp: |
+   You can subscribe a chat/channel to specific device updates.
+   Commands:
+   - /subscribe (codename) (type): This will subscribe chat/channel. Types can be: stable, beta, all. You could also enter 'any' instead of codename to recive updates for all devices.
+   - /unsubscribe (codename): Will unsubscribe a chat.
+   - /subscribed: Will list all subscribed devices.
+   - /subscriptionhelp: This message.
+
+sub_not_enoff_args: "Not enough arguments! Please use <code>/subscribe (codename) (all/beta/stable)</code>"
+sub_done: "This chat/channel now subscribed to <code>{codename}</code> updates in <code>{release_type}</code> branch."
+sub_err: "Error subscribing, looks like this chat already subscribed for <code>{codename}</code> updates, use /unsubscribe if you want unsubscribe it."
+sub_wrong_branch: "Wrong branch name, it can be all/any/beta/stable!"
+sub_wrong_device: "Wrong codename! Please enter the correct one."
+unsub_not_enoff_args: "Not enough arguments! Please use <code>/unsubscribe (codename)</code>."
+unsub_done: "This chat is now unsubscribed from <code>{codename}</code> updates."
+unsub_err: "Error unsubscribing, looks like this chat wasn't subscribed first."
+subscribed_title: |
+   <b>List of codenames that subscribe to this chat/channel:</b>
+   codename | branch
+update_text: |
+   <b>New OrangeFox update</b>
+   📱  <b>Device:</b> {fullname} (<code>{codename}</code>)
+   🔺  <b>Version:</b> <code>{version}</code>
+   🏷  <b>Type:</b> {release_type}
+   📅  <b>Date:</b> {date}support

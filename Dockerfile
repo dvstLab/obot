@@ -1,17 +1,41 @@
-FROM python:3.8-alpine
+# Copyright (C) 2018 - 2020 MrYacha.
+# Copyright (C) 2019 - 2020 Sophie.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# This file is part of oBot.
 
-RUN apk add gcc musl-dev libffi-dev openssl openssl-dev build-base
-#RUN pip install cython
+# Build image
+FROM python:3-slim AS compile-image
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends build-essential gcc
+RUN apt-get install -y git
 
-ADD requirements.txt /opt/requirements.txt
-RUN pip install -r /opt/requirements.txt
+COPY requirements.txt .
+RUN pip install --user -r requirements.txt
 
-RUN apk del gcc build-base zlib
 
-ADD obot/ /opt/obot/obot
-WORKDIR /opt/obot/
+# Run image
+FROM python:3-alpine AS run-image
+
+COPY --from=compile-image /root/.local /root/.local
+ENV PATH=/root/.local/bin:$PATH
+
+ADD . /obot
+RUN rm -rf /obot/data/
+WORKDIR /obot
 
 ENV PRODUCTION=true
 
-# start app
-CMD [ "python3", "-m", "obot" ]
+CMD [ "python", "-m", "obot" ]

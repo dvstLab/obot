@@ -8,14 +8,3 @@
 # oBOT is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-from aiogram import executor
-
-from obot import dp
-from obot.handlers import __setup__ as handlers
-
-handlers(dp)
-
-print("Starting bot..")
-
-executor.start_polling(dp, skip_updates=True)

@@ -1,4 +1,4 @@
-# Copyright (C) 2019 The Raphielscape Company LLC.
+# Copyright (C) 2017-2020 OrangeFox Recovery
 # Copyright (C) 2018 - 2020 MrYacha
 # Copyright (C) 2018 - 2020 Sophie
 # Copyright (C) 2020 oBOT
@@ -9,4 +9,9 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-OBOT_VERSION = 'v3'
+def __setup__(dp):
+    from .chat import ChatMiddleware
+    from .strings import StringsMiddleware
+
+    # dp.middleware.setup(ChatMiddleware())
+    dp.middleware.setup(StringsMiddleware())

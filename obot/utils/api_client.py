@@ -1,4 +1,4 @@
-# Copyright (C) 2019 The Raphielscape Company LLC.
+# Copyright (C) 2017-2020 OrangeFox Recovery
 # Copyright (C) 2018 - 2020 MrYacha
 # Copyright (C) 2018 - 2020 Sophie
 # Copyright (C) 2020 oBOT
@@ -9,11 +9,19 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+from orangefoxapi import OrangeFoxAPI
+import ujson as json
 
-def get_cmd(message):
-    cmd = message.text.lower().split()[0][1:].split('@')[0]
-    return cmd
+from obot import cache
 
-def get_args(message):
-    args = message.get_args().lower().split(' ')
-    return args
+#API_HOST = 'https://api.orangefox.download/v2/'
+API_HOST = 'http://127.0.0.1:5000'
+SSL = False
+
+
+api = OrangeFoxAPI(
+    host=API_HOST,
+    ssl=SSL,
+    cache=cache,
+    json=json
+)
