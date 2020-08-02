@@ -9,7 +9,7 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-from orangefoxapi import OrangeFoxAPI
+
 import ujson as json
 
 from obot import cache
