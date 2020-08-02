@@ -9,19 +9,17 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-
+from orangefoxapi import OrangeFoxAPI
 import ujson as json
 
 from obot import cache
 
 #API_HOST = 'https://api.orangefox.download/v2/'
-API_HOST = 'http://127.0.0.1:5000'
+#API_HOST = 'http://127.0.0.1:5000'
 SSL = False
 
 
 api = OrangeFoxAPI(
-    host=API_HOST,
-    ssl=SSL,
     cache=cache,
     json=json
 )
