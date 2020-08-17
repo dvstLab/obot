@@ -154,15 +154,16 @@ async def updates_fun():
                 url=last_release['url']
             ))
             try:
-                if not await bot.send_message(chat_id, text, reply_markup=buttons):
-                    continue
+                await bot.send_message(chat_id, text, reply_markup=buttons)
             except BadRequest:
                 db_subscribes.remove(query.chat_id == chat_id)
             except RetryAfter:
+                # Ratelimit reached
+                await cache.set('broadcast_num', 20)
                 continue
 
         query = Query()
         db_subscribes.update(
             {'release_id': last_release_id},
-            query.chat_id == chat_id and query.codename == codename
+            (query.chat_id == chat_id) & (query.codename == codename)
         )
