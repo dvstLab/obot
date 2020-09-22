@@ -18,6 +18,7 @@
 
 # Build image
 FROM python:3-slim AS compile-image
+
 RUN apt-get update
 RUN apt-get install -y --no-install-recommends build-essential gcc
 RUN apt-get install -y git
@@ -30,6 +31,8 @@ RUN pip install --user -r requirements.txt
 FROM python:3-alpine AS run-image
 
 RUN apk add libstdc++
+RUN apk add tzdata
+RUN ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime
 
 COPY --from=compile-image /root/.local /root/.local
 ENV PATH=/root/.local/bin:$PATH
