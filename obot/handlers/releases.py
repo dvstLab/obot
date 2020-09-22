@@ -22,7 +22,7 @@ from obot.utils.chats import get_chat_holder
 from obot.utils.purge import auto_purge
 
 
-@dp.message_handler(commands='list', chat_holder=['official', 'stable', 'beta', 'pm'])
+@dp.message_handler(commands='list', chat_holder=['official', 'stable', 'beta', 'pm'], is_chat_admin=True)
 @auto_purge
 async def list_devices_cmd(message: Message, strings={}):
     release_type = 'stable'
@@ -50,7 +50,7 @@ async def list_devices_cmd(message: Message, strings={}):
     return await message.reply(text)
 
 
-@dp.message_handler(regexp=re.compile(r'[/!#]\w+'), chat_holder=['official', 'stable', 'beta', 'pm'])
+@dp.message_handler(regexp=re.compile(r'[/!#]\w+'), chat_holder=['official', 'stable', 'beta', 'pm'], is_chat_admin=True)
 @auto_purge
 async def get_release_cmd(message: Message):
     build_type = 'stable'
@@ -78,7 +78,7 @@ async def get_release_cmd(message: Message):
     return await message.reply(text, reply_markup=buttons)
 
 
-@dp.message_handler(regexp=re.compile(r'[/!#]\w+'), chat_holder=['official', 'stable', 'beta', 'pm'])
+@dp.message_handler(regexp=re.compile(r'[/!#]\w+'), chat_holder=['official', 'stable', 'beta', 'pm'], is_chat_admin=True)
 @auto_purge
 async def get_oem_cmd(message: Message, strings={}):
     oem_name = get_cmd(message)
