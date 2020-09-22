@@ -18,4 +18,4 @@ handlers(dp)
 
 print("Starting bot..")
 
-executor.start_polling(dp, skip_updates=True)
+executor.start_polling(dp)
