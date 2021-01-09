@@ -19,6 +19,7 @@ from orangefoxapi.types import ReleaseType
 from obot import dp, api
 from obot.utils.devices import release_info, get_devices_list_text, get_codenames, get_oems, nothing_matching
 from obot.utils.message import get_release_type, get_arg
+from obot.utils.chats import get_chat_holder
 
 
 @dp.message_handler(commands='list', chat_holder=['pm'])
@@ -31,7 +32,7 @@ async def list_devices_cmd(message: Message, strings={}, regexp=None):
 
     devices = await api.devices(supported=True, release_type=release_type)
     text += get_devices_list_text(devices)
-    text += strings['list_help']
+    text += strings['list_help'] if await get_chat_holder(message) in ['pm'] else strings['other_chats_get']
 
     return await message.reply(text)
 
@@ -81,6 +82,6 @@ async def get_oem_cmd(message: Message, strings={}, regexp=None):
         type=strings[release_type.value]
     )
     text += get_devices_list_text(devices)
-    text += strings['list_help']
+    text += strings['list_help'] if await get_chat_holder(message) in ['pm'] else strings['other_chats_get']
 
     return await message.reply(text)
