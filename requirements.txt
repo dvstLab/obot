@@ -9,6 +9,7 @@ babel
 aiocron
 
 msgpack
+emoji-country-flag
 
 # OrangeFox API
 --extra-index-url https://gitlab.com/api/v4/projects/20272543/packages/pypi/simple
