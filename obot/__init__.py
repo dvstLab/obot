@@ -9,29 +9,28 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-import os
-import asyncio
-import yaml
-
-from tinydb import TinyDB
+import json
+from importlib import import_module
 
 from aiocache import caches
 from aiogram import Bot, Dispatcher, types
+from aiogram.bot.base import TelegramAPIServer
+from orangefoxapi import OrangeFoxAsyncAPI
+from tinydb import TinyDB
 
+VERSION = 'v5.0'
 
-VERSION = 'v4'
+print("---------------------------------")
+print(f"| OrangeFox Recovery bot - {VERSION} |")
+print("---------------------------------")
 
+CONFIG = json.load(open('data/config.json', "r"))
 
-print("------------------------------")
-print("|   OrangeFox Recovery bot   |")
-print("------------------------------")
+TOKEN: str = CONFIG['TOKEN']
+OWNER_ID: int = CONFIG['OWNER_ID']
 
-CONFIG = yaml.load(open('data/config.yaml', "r"), Loader=yaml.Loader)
-
-TOKEN = CONFIG['TOKEN']
-OWNER_ID = CONFIG['OWNER_ID']
-
-bot = Bot(token=TOKEN, parse_mode=types.ParseMode.HTML)
+api_server = TelegramAPIServer.from_base(CONFIG['BOTAPI'])
+bot = Bot(token=TOKEN, parse_mode=types.ParseMode.HTML, server=api_server)
 dp = Dispatcher(bot)
 
 print("Enabling databases...")
@@ -39,39 +38,22 @@ path: str = CONFIG['DB_PATH']
 
 db = TinyDB(CONFIG['DB_PATH'])
 
-print("Enabling cache...")
-if 'REDIS' in CONFIG:
-    print("* Enabling redis cache")
-    caches.set_config({
-        'default': {
-            'cache': "aiocache.RedisCache",
-            'endpoint': CONFIG['REDIS']['URI'],
-            'port': CONFIG['REDIS']['PORT'],
-            'timeout': 1,
-            'serializer': {
-                'class': "aiocache.serializers.PickleSerializer"
-            },
-            'plugins': [
-                {'class': "aiocache.plugins.HitMissRatioPlugin"},
-                {'class': "aiocache.plugins.TimingPlugin"}
-            ]
+print("* Enabling simple memory cache")
+caches.set_config({
+    'default': {
+        'cache': "aiocache.SimpleMemoryCache",
+        'serializer': {
+            'class': "aiocache.serializers.StringSerializer"
         }
-    })
-else:
-    print("* Enabling simple memory cache")
-    caches.set_config({
-        'default': {
-            'cache': "aiocache.SimpleMemoryCache",
-            'serializer': {
-                'class': "aiocache.serializers.StringSerializer"
-            }
-        }
-    })
+    }
+})
 
 cache = caches.get('default')
 
-print("Getting bot info...")
-loop = asyncio.get_event_loop()
-bot_info = loop.run_until_complete(bot.get_me())
-BOT_USERNAME = bot_info.username
-BOT_ID = bot_info.id
+api = OrangeFoxAsyncAPI(
+    cache_class=cache
+)
+
+import_module('obot.filters')
+import_module('obot.handlers')
+import_module('obot.middlewares')

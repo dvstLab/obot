@@ -21,9 +21,4 @@ async def get_chat_holder(message) -> str:
     if chat_id in CONFIG['CHATS']:
         return 'official'
 
-    elif chat_id == CONFIG['STABLE_CHAT']:
-        return 'stable'
-    elif chat_id == CONFIG['BETA_CHAT']:
-        return 'beta'
-
     return 'other'

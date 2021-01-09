@@ -9,56 +9,92 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+import difflib
+from datetime import datetime
+from string import Template
+from typing import Union
+
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
+from babel.dates import format_datetime
+from orangefoxapi.models import Release, Device
+from orangefoxapi.types import ReleaseType
 
-from .api_client import api
+from obot import api
 
 
-async def get_devices_list_text(devices, codename_code=False):
+def get_devices_list_text(devices, codename_code=False):
     text = ''
     for device in devices:
-        text += f"\n - {device['fullname']}"
+        text += f"\n - {device.full_name}"
         if codename_code:
-            text += f" (<code>{device['codename']}</code>)"
+            text += f" (<code>{device.codename}</code>)"
         else:
-            text += f" (/{device['codename']})"
+            text += f" (/{device.codename})"
 
     return text
 
 
-async def release_info(codename, build_type, version):
-    if build_type == 'last':
-        build_type = None
+async def get_codenames(release_type: Union[ReleaseType, None]) -> list:
+    codenames = []
+    for device in await api.devices(release_type=release_type):
+        codenames.append(device.codename)
 
-    device = await api.get_device(codename)
+    return codenames
+
+
+async def get_device_names() -> dict:
+    data = {}
+    for device in await api.devices():
+        data[device.id] = f"{device.full_name} (<code>{device.codename}</code>)"
+
+    return data
+
+
+async def get_oems() -> dict:
+    oems = await api.oems()
+
+    data = {}
+    for oem in oems:
+        data[oem.lower()] = oem
+
+    return data
+
+
+async def nothing_matching(strings, value) -> str:
+    codenames = await get_codenames(None)
+    oems = await get_oems()
+
+    text = Template(strings['nothing_is_found_text']).substitute(value=value)
+
+    possibilities: list = codenames
+    possibilities.extend(oems.keys())
+    if match_codename := difflib.get_close_matches(value, codenames, n=1, cutoff=0.7):
+        text += Template(strings['did_you_mean']).substitute(possible=match_codename[0])
+
+    return text
+
+
+async def release_info(strings: dict, release: Release, device: Device = None):
     if not device:
-        return None, None
+        device: Device = await api.device(id=release.device_id)
 
-    release = await api.get_device_release(codename, version=version, release_type=build_type)
-    if not release:
-        return None, None
+    text = Template(strings['release_text']).substitute(
+        fullname=device.full_name,
+        codename=device.codename,
+        version=release.version,
+        release_type=release.type,
+        date=format_datetime(datetime.fromtimestamp(release.date), locale=strings['babel'].language),
+        changelog='\n    - '.join(release.changelog)
+    )
 
-    maintained_list = {
-        1: f"<b>Maintainer:</b> {device['maintainer']['name']}, Maintained",
-        2: f"<b>Maintainer:</b> {device['maintainer']['name']}, Maintained without having device on hands",
-        3: f"<b>⚠️ Not maintained! Previous maintainer:</b> {device['maintainer']['name']}"
-    }
-    maintained = maintained_list[device['maintained']]
-
-    text = f"<b>Latest OrangeFox {release['build_type']} release</b>"
-    text += f"\n📱  <b>Device:</b> {device['fullname']} (<code>{device['codename']}</code>)"
-    text += f"\n👨‍🔬  {maintained}"
-    text += f"\n🔺  <b>Version:</b> <code>{release['version']}</code>"
-    text += f"\n💾  <b>Size:</b> {release['size_human']}"
-    text += f"\n📅  <b>Date:</b> " + release['date']
-
-    if 'notes' in release:
-        text += "\n\n📝 <b>Build notes:</b>\n"
-        text += release['notes']
+    if release.notes:
+        text += Template(strings['release_notes']).substitute(url=release.url + '/buildnotes')
+    if release.bugs:
+        text += Template(strings['release_bugs']).substitute(url=release.url + '/bugs')
 
     buttons = InlineKeyboardMarkup().add(InlineKeyboardButton(
-        '⬇️ Download',
-        url=release['url']
+        strings['release_dl_btn'],
+        url=release.url
     ))
 
     return text, buttons

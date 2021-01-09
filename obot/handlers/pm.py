@@ -16,7 +16,7 @@ from obot import VERSION, dp
 
 
 @dp.message_handler(commands='start', chat_type='private')
-async def pm_start(message: types.Message, strings={}):
+async def pm_start(message: types.Message, strings: dict = {}):
     text = strings['pm_start_text'].format(version=VERSION)
 
     buttons = InlineKeyboardMarkup(row_width=2)

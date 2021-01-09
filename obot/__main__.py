@@ -12,9 +12,6 @@
 from aiogram import executor
 
 from obot import dp
-from obot.handlers import __setup__ as handlers
-
-handlers(dp)
 
 print("Starting bot..")
 

@@ -10,6 +10,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 from functools import wraps
+
 from aiogram.utils.exceptions import MessageToDeleteNotFound
 
 from obot import cache, bot

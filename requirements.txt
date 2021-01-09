@@ -1,20 +1,15 @@
-
 aiogram
 
-loguru
-PyYAML>5.0
-
-# DBs
-redis
-aiocache[redis]
+PyYaml
+aiocache
 ujson
-tinydb
+aiotinydb
 
-aiohttp[speedups]
 babel
-
 aiocron
 
 msgpack
+
+# OrangeFox API
 --extra-index-url https://gitlab.com/api/v4/projects/20272543/packages/pypi/simple
-orangefoxapi
+orangefoxapi[async]

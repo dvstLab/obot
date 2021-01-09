@@ -1,7 +1,7 @@
 # Copyright (C) 2017-2020 OrangeFox Recovery
 # Copyright (C) 2018 - 2020 MrYacha
 # Copyright (C) 2018 - 2020 Sophie
-# Copyright (C) 2020 oBOT
+# Copyright (C) 2020 - 2021 oBOT
 #
 # This file is part of oBOT.
 #
@@ -10,109 +10,77 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 import re
+from string import Template
 
-from aiogram.types import Message
 from aiogram.dispatcher.handler import SkipHandler
+from aiogram.types import Message
+from orangefoxapi.types import ReleaseType
 
-from obot import dp
-from obot.utils.api_client import api
-from obot.utils.devices import release_info, get_devices_list_text
-from obot.utils.message import get_cmd, get_args
-from obot.utils.chats import get_chat_holder
-from obot.utils.purge import auto_purge
+from obot import dp, api
+from obot.utils.devices import release_info, get_devices_list_text, get_codenames, get_oems, nothing_matching
+from obot.utils.message import get_release_type, get_arg
 
 
 @dp.message_handler(commands='list', chat_holder=['pm'])
-@auto_purge
-async def list_devices_cmd(message: Message, strings={}):
-    release_type = 'stable'
+@dp.message_handler(commands='list', chat_holder=['official'], is_chat_admin=True)
+@dp.message_handler(regexp=re.compile(r"^/(?:o(?:range)?)?fox(?:r)?(?: )?(stable|beta)?$"), chat_holder='other')
+async def list_devices_cmd(message: Message, strings={}, regexp=None):
+    arg = regexp.group(1) if regexp else get_arg(message)
+    release_type = get_release_type(message, arg=arg) or ReleaseType.stable
+    text = Template(strings['list_title']).substitute(type=strings[release_type.value])
 
-    chat_id = message.chat.id
-    if (chat_holder := await get_chat_holder(message)) in ['stable', 'beta']:
-        release_type = chat_holder
-
-    if arg := get_args(message):
-        if arg[0] == 'beta':
-            release_type = 'beta'
-        elif arg[0] == 'any':
-            release_type = 'any'
-
-    build_type_text = strings[release_type]
-
-    text = strings['list_title'].format(build_type=build_type_text)
-
-    text += await get_devices_list_text(await api.get_devices_with_releases(release_type=release_type))
-
+    devices = await api.devices(supported=True, release_type=release_type)
+    text += get_devices_list_text(devices)
     text += strings['list_help']
-    if release_type != 'beta':
-        text += strings['list_help_beta']
 
     return await message.reply(text)
 
 
-@dp.message_handler(regexp=re.compile(r'[/!#]\w+'), chat_holder=['pm'])
-@auto_purge
-async def get_release_cmd(message: Message):
-    build_type = 'stable'
-    codename = get_cmd(message)
+@dp.message_handler(regexp=re.compile(r'^[/!#](\w+)(?: )?(stable|beta)?'), chat_holder='pm')
+@dp.message_handler(regexp=re.compile(r'^[/!#](\w+)(?: )?(stable|beta)?'), chat_holder='official', is_chat_admin=True)
+@dp.message_handler(regexp=re.compile(r"^/(?:o(?:range)?)?fox(?:r)? (\w+)(?: )?(stable|beta)?"), chat_holder='other')
+async def get_release_cmd(message: Message, strings: dict = {}, regexp=None):
+    codename = regexp.group(1).lower()
+    release_type = get_release_type(message, arg=regexp.group(2)) or ReleaseType.stable
 
-    # Device not found - let's try to get OEM
-    if codename not in await api.list_devices(only_codenames=True):
+    # If not found device try to search across oems
+    if codename not in await get_codenames(None):
         raise SkipHandler()
 
-    chat_id = message.chat.id
-    if (chat_holder := await get_chat_holder(message)) in ['stable', 'beta']:
-        build_type = chat_holder
+    device = await api.device(codename=codename)
 
-    if arg := get_args(message):
-        if arg[0] == 'beta':
-            build_type = 'beta'
-        elif arg[0] == 'last' or arg[0] == 'any':
-            build_type = 'last'
+    if not (releases := (await api.releases(device_id=device.id, type=release_type)).data):
+        text = Template(strings['release_found_for_device']).substitute(
+            type=strings[release_type.value],
+            device_name=device.full_name,
+            url=device.url
+        )
+        return await message.reply(text)
 
-    text, buttons = await release_info(codename, build_type, 'last')
+    release = await api.release(id=releases[0].id)
 
-    if not text:
-        return
-
-    return await message.reply(text, reply_markup=buttons)
+    text, buttons = await release_info(strings, release, device=device)
+    return await message.reply(text, reply_markup=buttons, disable_web_page_preview=True)
 
 
-@dp.message_handler(regexp=re.compile(r'[/!#]\w+'), chat_holder=['pm'])
-@auto_purge
-async def get_oem_cmd(message: Message, strings={}):
-    oem_name = get_cmd(message)
+@dp.message_handler(regexp=re.compile(r'^[/!#](\w+)(?: )?(stable|beta)?'), chat_holder='pm')
+@dp.message_handler(regexp=re.compile(r'^[/!#](\w+)(?: )?(stable|beta)?'), chat_holder='official', is_chat_admin=True)
+@dp.message_handler(regexp=re.compile(r"^/(?:o(?:range)?)?fox(?:r)? (\w+)(?: )?(stable|beta)?"), chat_holder='other')
+async def get_oem_cmd(message: Message, strings={}, regexp=None):
+    oem_name = regexp.group(1).lower()
 
-    # Get right OEM name as curent one can have wrong case.
-    oem = None
-    for c_oem in await api.list_oems():
-        if oem_name.lower() == c_oem.lower():
-            oem = c_oem
-    # OEM not found - nothing to do.
-    if not oem:
-        return
+    if oem_name not in (oems := await get_oems()).keys():
+        return await message.reply(await nothing_matching(strings, oem_name))
 
-    build_type = 'stable'
-    chat_id = message.chat.id
-    if (chat_holder := await get_chat_holder(message)) in ['stable', 'beta']:
-        build_type = chat_holder
+    release_type = get_release_type(message, arg=regexp.group(2)) or ReleaseType.stable
 
-    if arg := get_args(message):
-        if arg[0] == 'beta':
-            build_type = 'beta'
-        elif arg[0] == 'any':
-            build_type = 'any'
+    devices = await api.devices(oem_name=oems[oem_name])
 
-    text = strings['list_oem_title'].format(
-        oem_name=oem_name,
-        build_type=strings[build_type]
+    text = Template(strings['list_oem_title']).substitute(
+        oem=oems[oem_name],
+        type=strings[release_type.value]
     )
-
-    text += await get_devices_list_text(await api.get_oem_devices_with_releases(oem, release_type=build_type))
-
+    text += get_devices_list_text(devices)
     text += strings['list_help']
-    if build_type != 'beta':
-        text += strings['list_help_beta']
-    text += strings['list_oem_help']
 
     return await message.reply(text)

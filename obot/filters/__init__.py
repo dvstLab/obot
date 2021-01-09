@@ -9,8 +9,8 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-def __setup__(dp):
-    from .chat_type import ChatType, ChatHolder
+from obot import dp
+from .chat_type import ChatType, ChatHolder
 
-    dp.filters_factory.bind(ChatType)
-    dp.filters_factory.bind(ChatHolder)
+dp.filters_factory.bind(ChatType)
+dp.filters_factory.bind(ChatHolder)

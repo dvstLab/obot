@@ -10,86 +10,45 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 import hashlib
+from datetime import datetime
 
-from aiogram.types import InlineQuery, InputTextMessageContent, InlineQueryResultArticle
+from aiogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent
+from babel.dates import format_datetime
+from orangefoxapi.types import ReleaseType
 
-from obot.utils.api_client import api
-from obot.utils.devices import get_devices_list_text, release_info
-
-from obot.utils.strings import get_strings
-
-from obot import dp
+from obot import dp, api
+from obot.utils.devices import release_info
 
 
 @dp.inline_handler()
-async def inline_echo(inline_query: InlineQuery):
-    request = inline_query.query
-    strings = await get_strings(inline_query.from_user.id)
-
-    if not request:
-        articles = []
-
-        stable_devices_text = strings['inline_list_title'].format(build_type=strings['stable'])
-        devices = await api.get_devices_with_releases(release_type='stable')
-        stable_devices_text += await get_devices_list_text(devices, codename_code=True)
-        stable_devices_text += strings['inline_get']
-
-        articles.append(
-            InlineQueryResultArticle(
-                id=hashlib.md5((request + 'stable').encode()).hexdigest(),
-                title=strings['list_title'].format(build_type=strings['stable']),
-                description=strings['inline_list_desk'].format(build_type=strings['stable']),
-                input_message_content=InputTextMessageContent(stable_devices_text)
-            )
-        )
-
-        beta_devices_text = strings['inline_list_title'].format(build_type=strings['beta'])
-        devices = await api.get_devices_with_releases(release_type='beta')
-        beta_devices_text += await get_devices_list_text(devices, codename_code=True)
-        stable_devices_text += strings['inline_get']
-
-        articles.append(
-            InlineQueryResultArticle(
-                id=hashlib.md5((request + 'beta').encode()).hexdigest(),
-                title=strings['list_title'].format(build_type=strings['beta']),
-                description=strings['inline_list_desk'].format(build_type=strings['beta']),
-                input_message_content=InputTextMessageContent(beta_devices_text)
-            )
-        )
-        return await inline_query.answer(results=articles, cache_time=100)
-
-    codename = request.split(' ')[0].lower()
-    if codename not in await api.list_devices(only_codenames=True):
+async def inline_echo(inline_query: InlineQuery, strings: dict = {}):
+    codename = inline_query.query.lower().split(' ')[0]
+    if not codename:
         return await inline_query.answer([])
 
-    device = await api.get_device(codename)
-    articles = []
+    if not (device := await api.device(codename=codename)):
+        return await inline_query.answer([])
 
-    text, buttons = await release_info(codename, 'stable', 'last')
-    articles.append(
-        InlineQueryResultArticle(
-            id=hashlib.md5((request + 'stable').encode()).hexdigest(),
-            title=strings['inline_release_title'].format(
-                fullname=device["fullname"],
-                codename=device["codename"]
-            ),
-            input_message_content=InputTextMessageContent(text),
-            reply_markup=buttons
-        )
-    )
+    # Get beta/stable releases
+    releases = []
+    if release := await api.releases(device_id=device.id, type=ReleaseType.stable):
+        releases.append(release.data[0])
+    if release := await api.releases(device_id=device.id, type=ReleaseType.beta):
+        releases.append(release.data[0])
 
-    text, buttons = await release_info(codename, 'beta', 'last')
-    if text:
-        articles.append(
+    result = []
+
+    for release in releases:
+        release = await api.release(id=release.id)
+        text, buttons = await release_info(strings, release, device=device)
+        result.append(
             InlineQueryResultArticle(
-                id=hashlib.md5((request + 'beta').encode()).hexdigest(),
-                title=strings['inline_release_title'].format(
-                    fullname=device["fullname"],
-                    codename=device["codename"]
-                ),
-                input_message_content=InputTextMessageContent(text),
+                id=hashlib.md5(f"{codename}_{release.type}".encode()).hexdigest(),
+                title=f"{strings[release.type]}: {release.version}",
+                description=format_datetime(datetime.fromtimestamp(release.date), locale=strings['babel'].language),
+                input_message_content=InputTextMessageContent(text, disable_web_page_preview=True),
                 reply_markup=buttons
             )
         )
 
-    return await inline_query.answer(results=articles, cache_time=100)
+    return await inline_query.answer(result)

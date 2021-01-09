@@ -22,9 +22,14 @@ class StringsMiddleware(BaseMiddleware):
         strings = await get_strings(chat_id)
         data['strings'] = strings
 
-
     async def on_process_channel_post(self, message: types.Message, data: dict):
         chat_id = message.chat.id
+
+        strings = await get_strings(chat_id)
+        data['strings'] = strings
+
+    async def on_process_inline_query(self, inline_query: types.InlineQuery, data: dict):
+        chat_id = inline_query.from_user.id
 
         strings = await get_strings(chat_id)
         data['strings'] = strings

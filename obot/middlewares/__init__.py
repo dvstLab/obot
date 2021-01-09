@@ -9,9 +9,8 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-def __setup__(dp):
-    from .chat import ChatMiddleware
-    from .strings import StringsMiddleware
+from obot import dp
+from .strings import StringsMiddleware
 
-    # dp.middleware.setup(ChatMiddleware())
-    dp.middleware.setup(StringsMiddleware())
+# dp.middleware.setup(ChatMiddleware())
+dp.middleware.setup(StringsMiddleware())
