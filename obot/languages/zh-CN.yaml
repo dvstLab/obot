@@ -1,0 +1,90 @@
+---
+#Releases types
+stable: '稳定版'
+beta: '测试版'
+any: '任何版本'
+#Device
+all: "所有设备"
+#PM handlers
+pm_start_text: |
+  您好，我是官方的 OrangeFox 恢复机器人(<code>{version}</code>) 这是我可以为您做的事：
+  - /list：这显示了您支持的设备列表。
+  - <code>/(codename)</code>: 获取最新稳定的构建信息和下载链接 例如：/lavender
+  - <code>/ (OEM)</code>: 这将显示所有来自那个公司有稳定发行版的设备，例如：/Xiaomi。
+
+  - 支持非 OrangeFox 聊天室，并将我添加到您的聊天室，并键入/start以获得帮助。
+  - 我支持私聊模式， 尝试输入 <code>@ofoxr_bot</code> 在任何不禁用私聊的聊天室 <b></b>
+  - 订阅支持、阅读/subscriptionhelp的内容以获取更多信息。
+
+  由 <a href="api.orangefox.download">OrangeFox API 提供支持</a> | <a href="https://gitlab.com/OrangeFox/infrastructure/obot">来源</a>
+  运行于 <a href="https://www.ua-hosting.company">ua-hosting.company</a>的服务器。
+pm_btn_upd: '🔄 更新追踪'
+pm_btn_support_chat: '💬 帮助群组'
+pm_btn_news: '📢 公告'
+pm_btn_dl: '⬇️ 下载页面'
+list_title: "<b>有 $type 个版本支持您输入的设备：</b>"
+release_found_for_device: "⚠️ $device_name 设备没有可用的 $type 版本。查看所有版本在 <a href=\"$url\">设备页面</a>"
+list_help: "输入 <code>/(codename)</code> 来获取最新稳定版本，比如：/lavender"
+list_help_beta: "如果你想知道拥有测试版的机型，输入 <code>/list beta</code>"
+list_oem_title: "<b> $oem 的以下机型拥有 $type</b>发行版"
+list_oem_help: "\n如果你想知道所有的支持机型，输入 /list"
+nothing_is_found_text: "⚠️ <b>没找到 <code>$value</code>！</b>"
+did_you_mean: "\n你指的是: /$possible?"
+#Other chats
+other_chats_start: |2
+  您好！我是 OrangeFox Recovery 的官方机器人，以下是我能为非 OrangeFox 群组做的事：
+   - /start：显示这整个消息
+   - /orangefox：列出拥有稳定版本的机型
+   - <code>/orangefox (codename)</code>：该命令会显示某个机型的最新稳定版，例如：<code>/orangefox lavender</code>
+  - 支持订阅，输入 /subscriptionhelp 获取更多信息
+
+  您可以用以下别名：
+     /fox, /of, /ofox, /ofoxr' 来替换 <code>/orangefox</code> 命令
+
+  如果您想知道关于我的更多信息，请私聊我并输入 /start。
+other_chats_get: "\n\n输入 <code>/orangefox (codename)</code>来获取该设备的最新版本，例如：/orangefox lavender。"
+other_chats_404: "⚠️ 不支持该设备！输入 /orangefox 来查看支持的设备。"
+#Inline
+inline_list_title: "拥有{build_type}的机型如下："
+inline_list_desk: "该命令会列出拥有 {build_type} 构建的设备"
+inline_get: "\n\n输入 <code>@ofoxr_bot (codename)</code> 来获取最新的版本"
+inline_release_title: '{fullname} （{codename}） 的最新稳定版'
+#Updates
+subscriptionhelp: |
+  您可以为一个群组/频道订阅提供某个设备的更新。
+  命令：
+  - /subscribe (codename) (type)：该命令会订阅群组/频道。「type」可以是 Stable，beta 和 all。您也可以用 any 来代替「codename」来获取所有设备的更新。
+  - /unsubscribe (codename)：该命令将取消订阅群组。
+  - /subscribed：该命令会显示所有被订阅的机型。
+  - /subscriptionhelp：该命令会显示这整句话。
+sub_not_enoff_args: "命令错误！请使用 <code>/subscribe (codename) (all/beta/stable)</code>"
+sub_done: "<code>$codename</code> 的<code>$release_type</code>更新被订阅到该群组/频道。"
+sub_err: "订阅失败，看起来 <code>{codename}</code> 的更新已经被订阅到了该群组，如果您想取消订阅，请使用 /unsubscribe。"
+sub_wrong_branch: "错误的版本名称，它可以是 all/any/beta/stable！"
+sub_wrong_device: "错误的 codename！请输入正确。"
+unsub_not_enoff_args: "命令错误！请使用 <code>/unsubscribe (codename)</code>。"
+unsub_done: "此频道已取消订阅 <code>$codename</code> 更新。"
+unsub_err: "取消订阅时出错，看起来这个聊天室并没有订阅。"
+subscribed_title: |
+  <b>以下是被订阅到该群组/频道的设备：</b>
+  codename | branch
+not_subscribed: "还没有订阅的设备。如果您想要添加一些，请阅读/subscriptionhelp。"
+subscribed_all_already: "这个聊天已经订阅了所有设备，请先退订！"
+subscribed_devices: "此聊天有已存在的订阅，这些订阅必须先取消订阅，然后才能订阅所有设备。"
+subscribed_device: "此聊天已经订阅了 $device_name <code>($codename)</code>。如果您想要更改分支 - 先取消订阅。"
+#Release
+release_text: |
+  <b><u>OrangeFox Recovery <i>$release_type</i> release</u></b>
+    <b>设备：</b> $fullname (<code>$codename</code>)
+    <b>版本：</b> $version
+    <b>日期：</b> $date
+    <b><u>更新日志：</u></b>
+      - $changelog
+release_notes: "\n<a href='$url'><b>🗒 发布日志</b></a>"
+release_bugs: "\n<a href='$url'><b> ⚠发布Bug</b></a>"
+release_dl_btn: "⬇ 下载"
+#Locales
+current_locale: "<b>当前语言：</b> $emoji $language"
+select_locale: "\n选择一个新语言："
+select_btn: "$emoji $language"
+lang_selected: "语言已成功更改！"
