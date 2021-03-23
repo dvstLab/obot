@@ -42,7 +42,7 @@ other_chats_start: |
      /fox, /of, /ofox, /ofoxr'
 
   Напишите мне в личку и введите /start если хотите увидеть больше информации обо мне.
-other_chats_get: "\n\nДля получения последний релиз устройства, введите <code>/orangefox (codename)</code>, например: \"/orangefox lavender\"."
+other_chats_get: "\n\nДля получения последнего релиза устройства, введите <code>/orangefox (codename)</code>, например: \"/orangefox lavender\"."
 other_chats_404: "⚠️ Это устройство не поддерживается! Чтобы увидеть список устройств, введите /orangefox."
 #Inline
 inline_list_title: "Устройства с {build_type} релизами:"
