@@ -155,13 +155,13 @@ async def updates_fun():
         if not (last_known_id := item.get('last_known_id', None)):
             if not (releases := (await api.releases(device_id=device_id, type=release_type)).data):
                 print(f'There is no release! {device_id=} | {release_type=}')
-                return
+                continue
             release = releases[0]
             db_subscribes.update(
                 {'last_known_id': release.id},
                 (query.chat_id == chat_id) & (query.device_id == device_id)
             )
-            return
+            continue
 
         for update in await api.updates(last_known_id, release_type=release_type, device_id=device_id):
             release_id = update.id
