@@ -15,7 +15,7 @@ from string import Template
 
 import aiocron
 from aiogram.types import Message
-from aiogram.utils.exceptions import BadRequest, RetryAfter
+from aiogram.utils.exceptions import BadRequest, RetryAfter, UserDeactivated
 from tinydb import Query
 
 from obot import bot, dp, db, cache, api
@@ -189,7 +189,7 @@ async def updates_fun():
 
             try:
                 await bot.send_message(chat_id, text, reply_markup=buttons, disable_web_page_preview=True)
-            except BadRequest:
+            except (BadRequest, UserDeactivated):
                 db_subscribes.remove(query.chat_id == chat_id)
             except RetryAfter:
                 # Ratelimit reached
